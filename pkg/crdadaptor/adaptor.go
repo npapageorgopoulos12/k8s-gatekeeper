@@ -15,6 +15,7 @@
 package crdadaptor
 
 import (
+	"os"
 	"context"
 	"errors"
 	"fmt"
@@ -29,7 +30,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
+	// "k8s.io/client-go/util/homedir"
 )
 
 type K8sCRDAdaptor struct {
@@ -109,17 +110,21 @@ func (k *K8sCRDAdaptor) establishInternalClient() error {
 }
 
 func (k *K8sCRDAdaptor) establishExternalClient() error {
-	home := homedir.HomeDir()
-	config, err := clientcmd.BuildConfigFromFlags("", filepath.Join(home, ".kube", "config"))
-	if err != nil {
-		return err
-	}
-	clientset, err := versioned.NewForConfig(config)
-	if err != nil {
-		return err
-	}
-	k.clientset = clientset
-	return nil
+    home, err := os.UserHomeDir()
+    if err != nil {
+        return err
+    }
+    kubeConfigPath := filepath.Join(home, ".kube", "config")
+    config, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
+    if err != nil {
+        return err
+    }
+    clientset, err := versioned.NewForConfig(config)
+    if err != nil {
+        return err
+    }
+    k.clientset = clientset
+    return nil
 }
 
 func (k *K8sCRDAdaptor) getPolicyObject() (*k8sauthzv1.CasbinPolicy, error) {

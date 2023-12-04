@@ -15,13 +15,14 @@
 package client
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/casbin/k8s-gatekeeper/pkg/generated/clientset/versioned"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
+	// "k8s.io/client-go/util/homedir"
 )
 
 func (k *K8sGateKeeperClient) establishInternalClient() error {
@@ -38,18 +39,23 @@ func (k *K8sGateKeeperClient) establishInternalClient() error {
 }
 
 func (k *K8sGateKeeperClient) establishExternalClient() error {
-	home := homedir.HomeDir()
-	config, err := clientcmd.BuildConfigFromFlags("", filepath.Join(home, ".kube", "config"))
-	if err != nil {
-		return err
-	}
-	clientset, err := versioned.NewForConfig(config)
-	if err != nil {
-		return err
-	}
-	k.Clientset = clientset
-	return nil
+    home, err := os.UserHomeDir()
+    if err != nil {
+        return err
+    }
+    kubeConfigPath := filepath.Join(home, ".kube", "config")
+    config, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
+    if err != nil {
+        return err
+    }
+    clientset, err := versioned.NewForConfig(config)
+    if err != nil {
+        return err
+    }
+    k.Clientset = clientset
+    return nil
 }
+
 func trim(s string) string {
 	return strings.Trim(s, "\r\n ")
 }

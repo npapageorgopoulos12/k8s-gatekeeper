@@ -14,6 +14,7 @@
 package model
 
 import (
+	"os"
 	"context"
 	"path/filepath"
 	"strings"
@@ -25,7 +26,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
+	// "k8s.io/client-go/util/homedir"
 )
 
 type ModelLoader struct {
@@ -94,18 +95,23 @@ func (m *ModelLoader) establishInternalClient() error {
 }
 
 func (m *ModelLoader) establishExternalClient() error {
-	home := homedir.HomeDir()
-	config, err := clientcmd.BuildConfigFromFlags("", filepath.Join(home, ".kube", "config"))
-	if err != nil {
-		return err
-	}
-	clientset, err := versioned.NewForConfig(config)
-	if err != nil {
-		return err
-	}
-	m.clientset = clientset
-	return nil
+    home, err := os.UserHomeDir()
+    if err != nil {
+        return err
+    }
+    kubeConfigPath := filepath.Join(home, ".kube", "config")
+    config, err := clientcmd.BuildConfigFromFlags("", kubeConfigPath)
+    if err != nil {
+        return err
+    }
+    clientset, err := versioned.NewForConfig(config)
+    if err != nil {
+        return err
+    }
+    m.clientset = clientset
+    return nil
 }
+
 
 func ModelMacroSubstitution(originalModelText string) string {
 	res := strings.ReplaceAll(originalModelText, "${OBJECT}", "r.obj.Request.Object.Object")
