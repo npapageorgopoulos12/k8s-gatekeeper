@@ -85,8 +85,10 @@ Internal webhook means the webhook itself will be implmented as a service inside
 
 Run 
 ```shell
-docker build --target webhook -t k8s-gatekeeper .
+docker build --target webhook --build-arg KUBECONFIG_CONTENT="$(cat </path/to/your/kubeconfig>)" -t k8s-gatekeeper .
 ```
+*Note: Change accordingly  `</path/to/your/kubeconfig>`*
+
 Then there will be a local image called 'k8s-gatekeeper:latest'.
 
 *Note: if you are using minikube, please execute `eval $(minikube -p minikube docker-env)` before running docker build*

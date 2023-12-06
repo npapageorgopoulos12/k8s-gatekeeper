@@ -7,8 +7,15 @@ RUN go env -w GOPROXY=https://goproxy.cn,direct && \
 
 FROM debian:latest as webhook
 WORKDIR /workspace
+
 COPY --from=builder /webhook/webhook .
 COPY --from=builder /webhook/config ./config
-CMD cd /workspace && ./webhook --externalClient=false
 
+# accept kubeconfig content as a build argument
+ARG KUBECONFIG_CONTENT
 
+# create the .kube directory and write the kubeconfig content
+RUN mkdir -p /root/.kube && echo "$KUBECONFIG_CONTENT" > /root/.kube/config
+RUN chmod 600 /root/.kube/config
+
+CMD ["./webhook", "--externalClient=false"]
