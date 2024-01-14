@@ -1,0 +1,13 @@
+{
+    "name": "allowed-repo",
+    "enabled": true,
+    "modelText": "[request_definition]\nr =  obj\n\n[policy_definition]\np =  obj,eft\n\n[policy_effect]\ne = !some(where (p.eft == deny))\n\n[matchers]\nm = ${NAMESPACE} == \"default\" && ${RESOURCE} ==\"deployments\" && access(${OBJECT}.Spec.Template.Spec.Containers , 0, \"Image\") == p.obj"
+  }
+  
+
+  
+  {
+    "name": "allowed-repo",
+    "policyItem": "p, \"nginx:1.13.1\",allow\np, \"nginx:1.14.1\",deny"
+  }
+  

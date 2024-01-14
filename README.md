@@ -79,6 +79,13 @@ Three methods are provided for installing K8s-gatekeeper: External webhook, Inte
 
 *Note: these methods are only for user to try K8s-gatekeeper, and it is not secure. If you want to use it in productive environment, please make sure you read Chapter 5. Advanced setting and make modifications accordingly when necessary before installation  *
 
+
+First, you need to create a ConfigMap in Kubernetes that contains your kubeconfig file. Save your kubeconfig file as config and use the following command to create a ConfigMap:
+
+```shell
+kubectl create configmap kubeconfig --from-file=config=path/to/your/kubeconfig
+```
+
 ### 2.1 Internal webhook
 #### 2.1.1 Step 1: Build image
 Internal webhook means the webhook itself will be implmented as a service inside k8s. Creating a service as well as deployment requires a image of K8s-gatekeeper. You can should build your own image.
